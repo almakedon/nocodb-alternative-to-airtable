@@ -101,9 +101,6 @@ export const InitMetaServiceProvider: FactoryProvider = {
     // load super admin user from env if env is set
     await initAdminFromEnv(metaService);
 
-    // encrypt datasource if secret is set
-    await initDataSourceEncryption(metaService);
-
     // init plugin manager
     await NcPluginMgrv2.init(Noco.ncMeta);
     await Noco.loadEEState();
@@ -119,6 +116,12 @@ export const InitMetaServiceProvider: FactoryProvider = {
       instance: getInstance,
     });
     T.emit('evt_app_started', await User.count());
+
+    // decide base behavior based on env and database permissions
+    await initBaseBehavior();
+
+    // encrypt datasource if secret is set
+    await initDataSourceEncryption(metaService);
 
     return metaService;
   },
